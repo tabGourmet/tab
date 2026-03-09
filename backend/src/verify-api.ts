@@ -8,13 +8,13 @@ async function runTest() {
     try {
         // 1. Health Check
         process.stdout.write('1️⃣  Health Check... ');
-        const health = await fetch(`${BASE_URL}/health`).then(r => r.ok ? r.json() : r.statusText);
+        const health = await fetch(`${BASE_URL}/health`).then(r => r.ok ? r.json() : r.statusText) as any;
         console.log(health.status === 'ok' ? '✅ OK' : '❌ FAILED');
 
         // 2. Get Rest
         process.stdout.write('2️⃣  Get Demo Restaurant... ');
         const restRes = await fetch(`${API_URL}/restaurants/demo-restaurant`);
-        const restData = await restRes.json();
+        const restData = await restRes.json() as any;
         if (!restData.success) throw new Error('Failed to get restaurant');
         const restaurant = restData.data;
         console.log(`✅ ${restaurant.name} (${restaurant.id})`);
@@ -22,7 +22,7 @@ async function runTest() {
         // 3. Get Menu
         process.stdout.write('3️⃣  Get Menu... ');
         const menuRes = await fetch(`${API_URL}/restaurants/${restaurant.id}/menu`);
-        const menuData = await menuRes.json();
+        const menuData = await menuRes.json() as any;
         const products = menuData.data.products;
         console.log(`✅ ${products.length} products loaded`);
 
@@ -41,13 +41,13 @@ async function runTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ consumerName: 'Tester 1' }),
         });
-        const sessionData = await sessionRes.json();
+        const sessionData = await sessionRes.json() as any;
 
         let session;
         if (!sessionData.success && sessionData.error?.includes('active session')) {
             // Reuse existing
             const activeRes = await fetch(`${API_URL}/restaurants/${restaurant.id}/active-sessions`);
-            const activeData = await activeRes.json();
+            const activeData = await activeRes.json() as any;
             session = activeData.data.find((s: any) => s.tableId === table.id);
             if (!session) throw new Error("Could not find existing session");
             console.log(`⚠️  Reusing Active Session: ${session.id.substring(0, 8)}...`);
@@ -65,7 +65,7 @@ async function runTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: 'Tester 2' }),
         });
-        const addConsumerData = await addConsumerRes.json();
+        const addConsumerData = await addConsumerRes.json() as any;
         const consumer2 = addConsumerData.data;
         console.log(`✅ Added: ${consumer2.name}`);
 
@@ -88,7 +88,7 @@ async function runTest() {
         // 8. Totals
         console.log('\n8️⃣  Checking Totals:');
         const totalsRes = await fetch(`${API_URL}/sessions/${session.id}/totals`);
-        const totalsData = await totalsRes.json();
+        const totalsData = await totalsRes.json() as any;
         if (totalsData.data.sessionTotal > 0) {
             totalsData.data.consumerTotals.forEach((c: any) => {
                 console.log(`   👤 ${c.name}: $${c.total}`);
@@ -104,14 +104,14 @@ async function runTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type: 'WAITER' }),
         });
-        const callData = await callRes.json();
+        const callData = await callRes.json() as any;
         const serviceCallId = callData.data.id;
         console.log(`✅ Called (ID: ${serviceCallId.substring(0, 8)}...)`);
 
         // 10. Verify Admin Notification
         process.stdout.write('🔟 Verify Notifications... ');
         const notifRes = await fetch(`${API_URL}/restaurants/${restaurant.id}/notifications`);
-        const notifData = await notifRes.json();
+        const notifData = await notifRes.json() as any;
         const foundCall = notifData.data.find((n: any) => n.id === serviceCallId);
         if (foundCall) console.log('✅ Found in Admin');
         else throw new Error('Notification not found');
@@ -121,7 +121,7 @@ async function runTest() {
         const resolveRes = await fetch(`${API_URL}/service-calls/${serviceCallId}/resolve`, {
             method: 'PATCH'
         });
-        const resolveData = await resolveRes.json();
+        const resolveData = await resolveRes.json() as any;
         if (resolveData.data.status === 'RESOLVED') console.log('✅ Resolved');
         else console.log('❌ Failed');
 
@@ -132,7 +132,7 @@ async function runTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'CLOSED' }),
         });
-        const closeData = await closeRes.json();
+        const closeData = await closeRes.json() as any;
         if (closeData.data.status === 'CLOSED') console.log('✅ Session Closed');
         else console.log('❌ Failed');
 
