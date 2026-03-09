@@ -18,5 +18,8 @@
         "db:push": "npm run db:push --workspace=backend",
         "db:seed": "npm run db:seed --workspace=backend",
         "db:studio": "npm run db:studio --workspace=backend"
+    },
+    "devDependencies": {
+        "prisma": "^7.4.2"
     }
 }
