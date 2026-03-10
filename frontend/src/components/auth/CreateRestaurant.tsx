@@ -30,7 +30,7 @@ const CreateRestaurant: React.FC = () => {
 
         try {
             const token = localStorage.getItem('gs_token');
-            const response = await fetch('${import.meta.env.VITE_API_URL}/auth/create-restaurant', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/create-restaurant`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
