@@ -28,7 +28,7 @@ const ChangePassword: React.FC = () => {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:3001/api/v1/auth/change-password', {
+            const response = await fetch('${import.meta.env.VITE_API_URL}/auth/change-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
