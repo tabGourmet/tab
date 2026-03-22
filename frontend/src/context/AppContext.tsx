@@ -109,8 +109,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
                 setProducts(menu.products || []);
                 setCategories(menu.categories || []);
 
-                // 3. Restore Session
-                const token = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+                // 3. Restore Session (using sessionStorage for per-tab identity isolation)
+                const token = sessionStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
 
                 if (token) {
                     try {
@@ -119,16 +119,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
 
                         // Restore current user from session data
                         // We still store USER_ID to know which consumer is "me"
-                        const savedUserId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+                        const savedUserId = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
                         if (savedUserId) {
                             const me = sessionData.consumers.find(c => c.id === savedUserId);
                             if (me) setCurrentUser(me);
                         }
                     } catch (e) {
                         console.warn('Could not restore session', e);
-                        localStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
-                        localStorage.removeItem(STORAGE_KEYS.SESSION_ID);
-                        localStorage.removeItem(STORAGE_KEYS.USER_ID);
+                        sessionStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
+                        sessionStorage.removeItem(STORAGE_KEYS.SESSION_ID);
+                        sessionStorage.removeItem(STORAGE_KEYS.USER_ID);
                     }
                 }
             } catch (err: any) {
@@ -160,9 +160,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
             setSession(newSession);
             setCurrentUser(consumer);
 
-            localStorage.setItem(STORAGE_KEYS.SESSION_TOKEN, token);
-            localStorage.setItem(STORAGE_KEYS.SESSION_ID, newSession.id);
-            localStorage.setItem(STORAGE_KEYS.USER_ID, consumer.id);
+            sessionStorage.setItem(STORAGE_KEYS.SESSION_TOKEN, token);
+            sessionStorage.setItem(STORAGE_KEYS.SESSION_ID, newSession.id);
+            sessionStorage.setItem(STORAGE_KEYS.USER_ID, consumer.id);
             return true;
         } catch (err: any) {
             setError(err.message);
@@ -199,8 +199,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
 
             // We don't get a token here... that's a gap if this path is used.
             // But the main flow is QR Scan -> Table -> startSessionAtTable.
-            localStorage.setItem(STORAGE_KEYS.SESSION_ID, sessionId);
-            localStorage.setItem(STORAGE_KEYS.USER_ID, consumer.id);
+            sessionStorage.setItem(STORAGE_KEYS.SESSION_ID, sessionId);
+            sessionStorage.setItem(STORAGE_KEYS.USER_ID, consumer.id);
         } catch (err: any) {
             setError(err.message);
             throw err;
@@ -224,9 +224,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
     const leaveSession = () => {
         setSession(null);
         setCurrentUser(null);
-        localStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.SESSION_ID);
-        localStorage.removeItem(STORAGE_KEYS.USER_ID);
+        sessionStorage.removeItem(STORAGE_KEYS.SESSION_TOKEN);
+        sessionStorage.removeItem(STORAGE_KEYS.SESSION_ID);
+        sessionStorage.removeItem(STORAGE_KEYS.USER_ID);
     };
 
     const addItemToOrder = async (product: Product, quantity: number, consumerIds: string[]) => {
@@ -333,7 +333,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
                 const updated = await api.getSession(session.id);
                 setSession(updated);
                 // Also update currentUser in case consumer data changed
-                const savedUserId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+                const savedUserId = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
                 if (savedUserId) {
                     const me = updated.consumers?.find((c: any) => c.id === savedUserId);
                     if (me) setCurrentUser(me);
