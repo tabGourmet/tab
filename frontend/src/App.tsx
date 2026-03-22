@@ -10,12 +10,21 @@ import Register from './components/auth/Register';
 import CreateRestaurant from './components/auth/CreateRestaurant';
 import './index.css';
 import ChangePassword from './components/business/ChangePassword';
+import { QRScanner } from './QRScanner/scannerQr';
 
 // Pantalla de inicio: Escanear QR o llamar al mozo
 const StartSession = () => {
     const { callWaiterWithoutSession } = useApp();
     const [waiterCalled, setWaiterCalled] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [showScanner, setShowScanner] = React.useState(false);
+
+
+    const handleQRResult = (result: string) => {
+  console.log('QR escaneado:', result);
+  setShowScanner(false);
+  // Hacer algo con el resultado
+};
 
     const handleCallWaiter = () => {
         setIsLoading(true);
@@ -42,7 +51,9 @@ const StartSession = () => {
                 <h1 className="form-title" style={{ marginBottom: 'var(--spacing-xl)' }}>BIENVENIDO</h1>
 
                 {/* QR Scan Message */}
-                <div style={{
+                <div 
+                onClick={() => setShowScanner(true)}
+                style={{
                     textAlign: 'center',
                     marginBottom: 'var(--spacing-xl)',
                     padding: 'var(--spacing-lg)',
@@ -58,6 +69,22 @@ const StartSession = () => {
                         Encontrá el código QR en tu mesa
                     </p>
                 </div>
+
+
+
+
+              {/*   <button onClick={() => setShowScanner(true)}>
+  Escanear QR
+</button> */}
+
+{showScanner && (
+  <QRScanner 
+    onScan={handleQRResult} 
+    onClose={() => setShowScanner(false)} 
+  />
+)}
+
+
 
                 {/* Divider */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)', width: '100%' }}>

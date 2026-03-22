@@ -214,6 +214,7 @@ export const AdminOrders: React.FC = () => {
 
                     return (
                         <div
+                        className='ordersListProductsResponsive'
                             key={session.id}
                             style={{
                                 background: 'var(--color-surface)',
@@ -274,10 +275,11 @@ export const AdminOrders: React.FC = () => {
                             </div>
 
                             {/* Order items */}
-                            <div style={{ padding: 'var(--spacing-sm) 0' }}>
+                            <div 
+                            style={{ padding: 'var(--spacing-sm) 0' }}>
                                 {session.orders.flatMap(order =>
                                     order.items.sort((a, b) => b.timestamp - a.timestamp).map((item: OrderItem) => (
-                                        <div
+                                        <div className='footerOrderItemsResponsive'
                                             key={item.id}
                                             style={{
                                                 display: 'flex',
