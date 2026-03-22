@@ -4,6 +4,7 @@ import { Menu } from './Menu';
 import { OrderSummary } from './OrderSummary';
 import { useParams } from 'react-router-dom';
 import logoCustomer from '../../assets/logo-customer.png';
+import { ConsumerDetailsModal } from './ConsumerDetailsModal';
 
 
 export const CustomerApp: React.FC = () => {
@@ -11,6 +12,7 @@ export const CustomerApp: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'menu' | 'bill'>('menu');
     const [showAddPerson, setShowAddPerson] = useState(false);
     const [newPersonName, setNewPersonName] = useState('');
+    const [selectedConsumerId, setSelectedConsumerId] = useState<string | null>(null);
 
     const { tableNumber } = useParams<{ tableNumber: string }>();
 
@@ -45,21 +47,31 @@ export const CustomerApp: React.FC = () => {
                     marginTop: 'var(--spacing-md)',
                     flexWrap: 'wrap'
                 }}>
-                    {session?.consumers?.map((consumer) => (
-                        <span
+                    {session?.consumers?.map((consumer) => {
+                        const isMe = consumer.id === currentUser?.id;
+                        const isSelected = consumer.id === selectedConsumerId;
+                        return (
+                        <button
                             key={consumer.id}
+                            onClick={() => setSelectedConsumerId(consumer.id)}
                             style={{
                                 padding: '0.5rem 1rem',
                                 borderRadius: 'var(--radius-md)',
-                                background: consumer.id === currentUser?.id ? 'var(--color-primary-client)' : 'var(--color-surface)',
-                                color: consumer.id === currentUser?.id ? '#000' : 'var(--color-text)',
+                                background: isSelected ? 'var(--color-primary)' : isMe ? 'var(--color-primary-client)' : 'var(--color-surface)',
+                                color: (isMe || isSelected) ? '#000' : 'var(--color-text)',
                                 fontSize: '0.875rem',
                                 fontWeight: 500,
+                                border: isSelected ? '2px solid #fff' : '2px solid transparent',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                opacity: 0.9,
                             }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
                         >
-                            {consumer.name} {consumer.id === currentUser?.id && '(Yo)'}
-                        </span>
-                    ))}
+                            {consumer.name} {isMe && '(Yo)'}
+                        </button>
+                    )})}
                     <button
                         onClick={() => setShowAddPerson(true)}
                         style={{
@@ -132,6 +144,14 @@ export const CustomerApp: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Consumer Details Modal */}
+            {selectedConsumerId && (
+                <ConsumerDetailsModal 
+                    consumerId={selectedConsumerId} 
+                    onClose={() => setSelectedConsumerId(null)} 
+                />
             )}
 
             {/* Content */}

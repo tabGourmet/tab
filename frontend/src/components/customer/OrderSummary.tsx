@@ -1,33 +1,13 @@
 import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { calculateConsumerTotal } from '../../utils/orderCalculations';
 
 export const OrderSummary: React.FC = () => {
     const { session, currentUser } = useApp();
 
     const myShare = useMemo(() => {
         if (!session || !currentUser) return { total: 0, items: [] };
-
-        let total = 0;
-        const items: { name: string; quantity: number; sharePrice: number; isShared: boolean }[] = [];
-
-        session.orders.forEach((order) => {
-            order.items.forEach((item) => {
-                if (item.consumerIds.includes(currentUser.id)) {
-                    const splitFactor = item.consumerIds.length;
-                    const priceShare = (item.product.price * item.quantity) / splitFactor;
-
-                    total += priceShare;
-                    items.push({
-                        name: item.product.name,
-                        quantity: item.quantity,
-                        sharePrice: priceShare,
-                        isShared: splitFactor > 1,
-                    });
-                }
-            });
-        });
-
-        return { total, items };
+        return calculateConsumerTotal(session.orders, currentUser.id);
     }, [session, currentUser]);
 
     const totalTable = useMemo(() => {
