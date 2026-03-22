@@ -13,7 +13,7 @@ const RESTAURANT_SLUG = import.meta.env.VITE_RESTAURANT_SLUG || 'demo-restaurant
 
 // Helper for Fetch requests
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const token = localStorage.getItem('gs_token');
+    const token = localStorage.getItem('gastrosplit_session_token');
 
     const headers: HeadersInit = {
         'Content-Type': 'application/json',

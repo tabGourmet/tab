@@ -324,6 +324,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, restaurantSl
         }
     }, [restaurantId]);
 
+    // Customer session polling - refresh session data periodically for multi-user sync
+    useEffect(() => {
+        if (!session?.id) return;
+
+        const intervalId = setInterval(async () => {
+            try {
+                const updated = await api.getSession(session.id);
+                setSession(updated);
+                // Also update currentUser in case consumer data changed
+                const savedUserId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+                if (savedUserId) {
+                    const me = updated.consumers?.find((c: any) => c.id === savedUserId);
+                    if (me) setCurrentUser(me);
+                }
+            } catch (e) {
+                console.warn('Customer session poll failed:', e);
+            }
+        }, 15000);
+
+        return () => clearInterval(intervalId);
+    }, [session?.id]);
+
     // Auto-poll every 10 seconds for admin data
     useEffect(() => {
         if (!restaurantId) return;

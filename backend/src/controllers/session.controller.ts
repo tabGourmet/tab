@@ -53,17 +53,85 @@ export class SessionController {
 
             // Generate token
             const token = jwt.sign(
-                { 
-                    sessionId: session.id, 
+                {
+                    sessionId: session.id,
                     consumerId: consumer.id,
                     tableId,
-                    role: 'customer' 
+                    role: 'customer'
                 },
                 JWT_SECRET,
                 { expiresIn: '24h' }
             );
 
-            res.json({ success: true, data: { token, session, consumer } });
+            // Re-fetch session with all includes for complete frontend state
+            const fullSession = await prisma.session.findUnique({
+                where: { id: session.id },
+                include: {
+                    table: true,
+                    consumers: { orderBy: { joinedAt: 'asc' } },
+                    order: {
+                        include: {
+                            items: {
+                                include: {
+                                    product: true,
+                                    consumers: { include: { consumer: true } },
+                                },
+                                orderBy: { createdAt: 'desc' },
+                            },
+                        },
+                    },
+                    serviceCalls: { orderBy: { createdAt: 'desc' } },
+                },
+            });
+
+            // Transform to frontend-compatible format
+            const sessionResponse = fullSession ? {
+                id: fullSession.id,
+                tableId: fullSession.table.number,
+                businessId: fullSession.table.restaurantId,
+                status: fullSession.status.toLowerCase(),
+                startTime: fullSession.startedAt.getTime(),
+                endTime: fullSession.endedAt?.getTime(),
+                consumers: fullSession.consumers.map(c => ({
+                    id: c.id,
+                    sessionId: c.sessionId,
+                    name: c.name,
+                    isGuest: true,
+                    visitCount: 1,
+                })),
+                orders: fullSession.order ? [{
+                    id: fullSession.order.id,
+                    sessionId: fullSession.order.sessionId,
+                    items: fullSession.order.items.map(item => ({
+                        id: item.id,
+                        productId: item.productId,
+                        product: {
+                            id: item.product.id,
+                            name: item.product.name,
+                            description: item.product.description,
+                            price: Number(item.product.price),
+                            category: '',
+                            image: item.product.imageUrl || '',
+                            isAvailable: item.product.isAvailable,
+                        },
+                        quantity: item.quantity,
+                        consumerIds: item.consumers.map(c => c.consumerId),
+                        status: item.status.toLowerCase(),
+                        timestamp: item.createdAt.getTime(),
+                    })),
+                    status: fullSession.order.status.toLowerCase(),
+                    createdAt: fullSession.order.createdAt.getTime(),
+                }] : [],
+                serviceCalls: fullSession.serviceCalls.map(call => ({
+                    id: call.id,
+                    sessionId: call.sessionId,
+                    type: call.type.toLowerCase(),
+                    status: call.status.toLowerCase(),
+                    timestamp: call.createdAt.getTime(),
+                })),
+            } : session;
+
+            res.json({ success: true, data: { token, session: sessionResponse, consumer } });
         } catch (error) {
             next(error);
         }
@@ -107,11 +175,11 @@ export class SessionController {
             });
 
             if (!session || session.status !== 'ACTIVE') {
-                 throw new AppError('Session not active', 404);
+                throw new AppError('Session not active', 404);
             }
 
             // Transform to match frontend format (re-using getById logic essentially)
-             const response = {
+            const response = {
                 id: session.id,
                 tableId: session.table.number,
                 businessId: session.table.restaurantId,
@@ -250,7 +318,7 @@ export class SessionController {
             const { name } = req.body;
 
             const session = await prisma.session.findUnique({
-                where: { id : String(sessionId) },
+                where: { id: String(sessionId) },
                 include: { table: true },
             });
 
