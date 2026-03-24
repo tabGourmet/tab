@@ -13,8 +13,16 @@ export const CustomerApp: React.FC = () => {
     const [showAddPerson, setShowAddPerson] = useState(false);
     const [newPersonName, setNewPersonName] = useState('');
     const [selectedConsumerId, setSelectedConsumerId] = useState<string | null>(null);
+    const [waiterCalled, setWaiterCalled] = useState(false);
 
     const { tableNumber } = useParams<{ tableNumber: string }>();
+
+    const handleCallWaiter = () => {
+        if (waiterCalled) return; // prevent spam
+        callWaiter();
+        setWaiterCalled(true);
+        setTimeout(() => setWaiterCalled(false), 3000);
+    };
 
     const handleAddPerson = () => {
         if (newPersonName.trim()) {
@@ -176,10 +184,16 @@ export const CustomerApp: React.FC = () => {
                     MI CUENTA
                 </button>
                 <button
-                    className="nav-button inactive"
-                    onClick={callWaiter}
+                    className={`nav-button ${waiterCalled ? 'active' : 'inactive'}`}
+                    onClick={handleCallWaiter}
+                    disabled={waiterCalled}
+                    style={waiterCalled ? {
+                        backgroundColor: '#4caf50',
+                        color: '#000',
+                        transition: 'all 0.3s ease',
+                    } : {}}
                 >
-                    🔔 MOZO
+                    {waiterCalled ? '✅ LLAMADO' : '🔔 MOZO'}
                 </button>
                 {/* <button
                     className="nav-button inactive"

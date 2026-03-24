@@ -386,8 +386,6 @@ body {
   flex: 1 1 120px;
 }
 
-/*-----------------------------
-----------------------------*/
 
 
 
@@ -411,6 +409,12 @@ body {
   background-color: transparent;
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
+}
+
+.nav-button:active {
+  transform: scale(0.95); /* Se achica un poquito */
+  background-color: var(--color-primary); /* Cambia de color */
+  opacity: 0.8;
 }
 
 /* ========================================
@@ -651,7 +655,208 @@ body {
 }
 
 
-.form-button-qr-scanner {
+/* ========================================
+   QR Scanner Overlay
+   ======================================== */
+
+.qr-scanner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: qr-fade-in 0.3s ease;
+}
+
+@keyframes qr-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.qr-scanner-container {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.qr-scanner-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.qr-scanner-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.03em;
+}
+
+.qr-scanner-close-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.qr-scanner-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.qr-scanner-close-btn:active {
+  transform: scale(0.95);
+}
+
+.qr-scanner-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 65vh;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: #111;
+}
+
+.qr-scanner-reader {
   width: 100% !important;
-  font-size: 50px;
+  height: 100% !important;
+}
+
+/* Override html5-qrcode internal styles */
+.qr-scanner-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: var(--radius-lg);
+}
+
+.qr-scanner-reader #qr-shaded-region {
+  border-color: rgba(248, 160, 97, 0.5) !important;
+}
+
+/* Scanner corner decorations */
+.qr-scanner-viewport::before,
+.qr-scanner-viewport::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.qr-scanner-viewport::before {
+  top: 12px;
+  left: 12px;
+  border-top: 3px solid var(--color-primary-client);
+  border-left: 3px solid var(--color-primary-client);
+  border-radius: 4px 0 0 0;
+  animation: qr-corner-pulse 2s ease-in-out infinite;
+}
+
+.qr-scanner-viewport::after {
+  bottom: 12px;
+  right: 12px;
+  border-bottom: 3px solid var(--color-primary-client);
+  border-right: 3px solid var(--color-primary-client);
+  border-radius: 0 0 4px 0;
+  animation: qr-corner-pulse 2s ease-in-out infinite 1s;
+}
+
+@keyframes qr-corner-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Loading state */
+.qr-scanner-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--color-text);
+  z-index: 5;
+}
+
+.qr-scanner-loading p {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.qr-scanner-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--color-primary-client);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Error state */
+.qr-scanner-error {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-md);
+  width: 100%;
+}
+
+.qr-scanner-error p {
+  color: #f87171;
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.qr-scanner-retry-btn {
+  padding: 0.6rem 1.5rem;
+  background: rgba(248, 160, 97, 0.15);
+  color: var(--color-primary-client);
+  border: 1px solid rgba(248, 160, 97, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.qr-scanner-retry-btn:hover {
+  background: rgba(248, 160, 97, 0.25);
+}
+
+/* Hint text */
+.qr-scanner-hint {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  text-align: center;
 }
