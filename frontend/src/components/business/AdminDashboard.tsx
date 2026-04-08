@@ -320,7 +320,7 @@ export const AdminDashboard: React.FC = () => {
       const token = localStorage.getItem("gs_token");
 
       const response = await fetch(
-        `${apiUrl}/api/v1/products/${productId}/image`,
+        `${apiUrl}/products/${productId}/image`,
         {
           method: "PATCH",
           headers: {
