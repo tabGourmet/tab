@@ -22,111 +22,111 @@ const NotificationsWithFilter: React.FC<{
   markNotificationRead,
   resolveServiceCall,
 }) => {
-  const [isFiltered, setIsFiltered] = useState(false);
+    const [isFiltered, setIsFiltered] = useState(false);
 
-  const handleDateChange = (from: string, to: string) => {
-    setIsFiltered(true);
-    fetchNotificationsByDate(from, to);
-  };
+    const handleDateChange = (from: string, to: string) => {
+      setIsFiltered(true);
+      fetchNotificationsByDate(from, to);
+    };
 
-  // Use live notifications by default, filtered when date filter is used
-  const displayNotifications = isFiltered
-    ? filteredNotifications
-    : notifications;
+    // Use live notifications by default, filtered when date filter is used
+    const displayNotifications = isFiltered
+      ? filteredNotifications
+      : notifications;
 
-  return (
-    <>
-      <DateFilter onChange={handleDateChange} />
-      {displayNotifications.length === 0 ? (
-        <p className="text-center text-muted">
-          {isFiltered
-            ? "No hay notificaciones en este período"
-            : "No hay notificaciones"}
-        </p>
-      ) : (
-        displayNotifications.map((notification) => (
-          <div
-            key={notification.id}
-            style={{
-              padding: "var(--spacing-md)",
-              background: notification.read
-                ? "var(--color-surface)"
-                : "rgba(232, 197, 71, 0.15)",
-              border: notification.read
-                ? "1px solid var(--color-border)"
-                : "2px solid var(--color-primary)",
-              borderRadius: "var(--radius-md)",
-              marginBottom: "var(--spacing-sm)",
-            }}
-          >
+    return (
+      <>
+        <DateFilter onChange={handleDateChange} />
+        {displayNotifications.length === 0 ? (
+          <p className="text-center text-muted">
+            {isFiltered
+              ? "No hay notificaciones en este período"
+              : "No hay notificaciones"}
+          </p>
+        ) : (
+          displayNotifications.map((notification) => (
             <div
+              key={notification.id}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                padding: "var(--spacing-md)",
+                background: notification.read
+                  ? "var(--color-surface)"
+                  : "rgba(232, 197, 71, 0.15)",
+                border: notification.read
+                  ? "1px solid var(--color-border)"
+                  : "2px solid var(--color-primary)",
+                borderRadius: "var(--radius-md)",
+                marginBottom: "var(--spacing-sm)",
               }}
             >
-              <span style={{ fontWeight: 600, fontSize: "1rem" }}>
-                {notification.type === "waiter" ? "🔔" : "💳"} Mesa{" "}
-                {notification.tableId}
-              </span>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                {new Date(notification.timestamp).toLocaleTimeString()}
-              </span>
-            </div>
-            <p
-              style={{
-                marginTop: "var(--spacing-xs)",
-                fontSize: "0.875rem",
-                color: "var(--color-text)",
-              }}
-            >
-              {notification.message}
-            </p>
-            {!notification.read && (
               <div
                 style={{
                   display: "flex",
-                  gap: "var(--spacing-sm)",
-                  marginTop: "var(--spacing-sm)",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                <button
-                  onClick={() => {
-                    if (notification.sessionId) {
-                      resolveServiceCall(
-                        notification.sessionId,
-                        notification.id,
-                      );
-                    }
-                    markNotificationRead(notification.id);
-                  }}
+                <span style={{ fontWeight: 600, fontSize: "1rem" }}>
+                  {notification.type === "waiter" ? "🔔" : "💳"} Mesa{" "}
+                  {notification.tableId}
+                </span>
+                <span
                   style={{
-                    padding: "0.4rem 0.8rem",
-                    background: "var(--color-primary)",
-                    border: "none",
-                    borderRadius: "var(--radius-sm)",
-                    color: "#000",
-                    cursor: "pointer",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted)",
                   }}
                 >
-                  ✓ Atendido
-                </button>
+                  {new Date(notification.timestamp).toLocaleTimeString()}
+                </span>
               </div>
-            )}
-          </div>
-        ))
-      )}
-    </>
-  );
-};
+              <p
+                style={{
+                  marginTop: "var(--spacing-xs)",
+                  fontSize: "0.875rem",
+                  color: "var(--color-text)",
+                }}
+              >
+                {notification.message}
+              </p>
+              {!notification.read && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "var(--spacing-sm)",
+                    marginTop: "var(--spacing-sm)",
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      if (notification.sessionId) {
+                        resolveServiceCall(
+                          notification.sessionId,
+                          notification.id,
+                        );
+                      }
+                      markNotificationRead(notification.id);
+                    }}
+                    style={{
+                      padding: "0.4rem 0.8rem",
+                      background: "var(--color-primary)",
+                      border: "none",
+                      borderRadius: "var(--radius-sm)",
+                      color: "#000",
+                      cursor: "pointer",
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    ✓ Atendido
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </>
+    );
+  };
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -316,7 +316,7 @@ export const AdminDashboard: React.FC = () => {
       const formData = new FormData();
       formData.append("image", compressedFile);
 
-      const apiUrl = "http://localhost:3001";
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
       const token = localStorage.getItem("gs_token");
 
       const response = await fetch(
@@ -579,93 +579,93 @@ export const AdminDashboard: React.FC = () => {
             </header> */}
 
 
-          
 
-<header className="page-header" style={{ position: 'relative' }}>
-  {/* Fila superior de botones */}
-  <div
-    style={{
-      display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'space-around',
-      gap: 'var(--spacing-sm)',
-      marginBottom: 'var(--spacing-md)',
-    }}
-  >
-    <button
-      onClick={() => {
-        logout();
-        navigate('/login');
-      }}
-      style={{
-       minWidth: '185px',
-        padding: '0.5rem 1rem',
-        background: 'transparent',
-        border: '1px solid var(--color-primary)',
-        borderRadius: 'var(--radius-md)',
-        color: 'var(--color-primary)',
-        cursor: 'pointer',
-        fontSize: '0.85rem',
-      }}
-    > 🚪 Cerrar Sesión  
-    </button>
-    <button
-      onClick={() => navigate('/:slug/admin/settings')}
-      style={{
-        minWidth: '185px',
-        padding: '0.5rem 1rem',
-        background: 'transparent',
-        border: '1px solid var(--color-primary)',
-        borderRadius: 'var(--radius-md)',
-        color: 'var(--color-primary)',
-        cursor: 'pointer',
-        fontSize: '0.85rem',
-      }}
-    >
-    🔑 Cambiar Contraseña
-    </button>
-    <button
-      onClick={() => refreshData()}
-      style={{
-        minWidth: '185px',
-        padding: '0.5rem 1rem',
-        background: 'transparent',
-        border: '1px solid var(--color-primary)',
-        borderRadius: 'var(--radius-md)',
-        color: 'var(--color-primary)',
-        cursor: 'pointer',
-        fontSize: '0.85rem',
-      }}
-    >
-      🔄 Actualizar
-    </button>
-    <button
-      onClick={() => navigate(':slug/table/1/users')}
-      style={{
-        minWidth: '185px',
-        padding: '0.5rem 1rem',
-        background: 'transparent',
-        border: '1px solid var(--color-primary)',
-        borderRadius: 'var(--radius-md)',
-        color: 'var(--color-primary)',
-        cursor: 'pointer',
-        fontSize: '0.85rem',
-      }}
-    >
-      Vista Cliente ↗   
-    </button>
-  </div>
 
-  {/* Logo y títulos */}
-  <img src={logoBusiness} alt="Tab" style={{ width: 160, marginBottom: 'var(--spacing-xs)' }} />
-  <h1 className="page-title">PANEL ADMIN</h1>
-  <p className="page-subtitle">
-    {user ? `${user.businessName || user.email}` : 'TAB - Gestión del Negocio'}
-  </p>
-</header>
-     
-  
-      
+      <header className="page-header" style={{ position: 'relative' }}>
+        {/* Fila superior de botones */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-around',
+            gap: 'var(--spacing-sm)',
+            marginBottom: 'var(--spacing-md)',
+          }}
+        >
+          <button
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+            style={{
+              minWidth: '185px',
+              padding: '0.5rem 1rem',
+              background: 'transparent',
+              border: '1px solid var(--color-primary)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-primary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+            }}
+          > 🚪 Cerrar Sesión
+          </button>
+          <button
+            onClick={() => navigate('/:slug/admin/settings')}
+            style={{
+              minWidth: '185px',
+              padding: '0.5rem 1rem',
+              background: 'transparent',
+              border: '1px solid var(--color-primary)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-primary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            🔑 Cambiar Contraseña
+          </button>
+          <button
+            onClick={() => refreshData()}
+            style={{
+              minWidth: '185px',
+              padding: '0.5rem 1rem',
+              background: 'transparent',
+              border: '1px solid var(--color-primary)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-primary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            🔄 Actualizar
+          </button>
+          <button
+            onClick={() => navigate(':slug/table/1/users')}
+            style={{
+              minWidth: '185px',
+              padding: '0.5rem 1rem',
+              background: 'transparent',
+              border: '1px solid var(--color-primary)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-primary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            Vista Cliente ↗
+          </button>
+        </div>
+
+        {/* Logo y títulos */}
+        <img src={logoBusiness} alt="Tab" style={{ width: 160, marginBottom: 'var(--spacing-xs)' }} />
+        <h1 className="page-title">PANEL ADMIN</h1>
+        <p className="page-subtitle">
+          {user ? `${user.businessName || user.email}` : 'TAB - Gestión del Negocio'}
+        </p>
+      </header>
+
+
+
       {/* Tabs */}
       <div
         style={{
@@ -847,7 +847,7 @@ export const AdminDashboard: React.FC = () => {
                       cursor: "pointer",
                       fontSize: "0.85rem",
                       fontWeight: 600,
-                      
+
                     }}
                   >
                     Liberar Mesa
@@ -1139,35 +1139,35 @@ export const AdminDashboard: React.FC = () => {
                 </p>
               </div >
               <span className="productPriceResponsive"
-              style={{ fontWeight: 600 }}>
+                style={{ fontWeight: 600 }}>
                 ${product.price.toLocaleString()}
               </span>
               <div className="productsButtonsResponsive"
-              style={{ display: 'flex' }}>
-              <button
-                onClick={() => startEditProduct(product)}
-                style={{
-                  padding: "0.5rem",
-                  background: "transparent",
-                  border: "none",
-                  color: "var(--color-primary)",
-                  cursor: "pointer",
-                }}
-              >
-                ✏️
-              </button>
-              <button
-                onClick={() => deleteProduct(product.id)}
-                style={{
-                  padding: "0.5rem",
-                  background: "transparent",
-                  border: "none",
-                  color: "#d32f2f",
-                  cursor: "pointer",
-                }}
-              >
-                🗑️
-              </button>
+                style={{ display: 'flex' }}>
+                <button
+                  onClick={() => startEditProduct(product)}
+                  style={{
+                    padding: "0.5rem",
+                    background: "transparent",
+                    border: "none",
+                    color: "var(--color-primary)",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => deleteProduct(product.id)}
+                  style={{
+                    padding: "0.5rem",
+                    background: "transparent",
+                    border: "none",
+                    color: "#d32f2f",
+                    cursor: "pointer",
+                  }}
+                >
+                  🗑️
+                </button>
               </div>
             </div>
           ))}
